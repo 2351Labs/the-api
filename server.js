@@ -5,11 +5,21 @@ const PORT = 3001;
 const port = 3002;
 const { MongoClient } = require("mongodb");
 
-const cors = require('cors');
+const cors = require("cors");
 
+const nodemailer = require("nodemailer");
+
+// Create a transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "ProjectScrollos@gmail.com", // Replace with your email
+    pass: "yrik yudn adfo auew",
+  },
+});
 
 //for most use cases:
-app.use(cors())
+app.use(cors());
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -47,7 +57,7 @@ app.listen(PORT, () => {
 app.post("/signup", (req, res) => {
   var { email } = req.body;
   console.log("EMAIL", email);
-  
+
   db.collection("Users")
     .find({ email: email })
     .toArray()
@@ -55,7 +65,25 @@ app.post("/signup", (req, res) => {
       if (results.length == 0) {
         db.collection("Users")
           .insertOne({ email: email })
-          .then((results) => res.json(results))
+          .then((results) => {
+            // Define email options
+            const mailOptions = {
+              from: "ProjectScrollos@gmail.com", // Sender address
+              to: email, // List of recipients
+              subject: "Project Scrollos", // Subject line
+              text: "Thanks for showing your interest. We'll keep you up to date on any progress or changes with the project.", // Plain text body
+            };
+
+            // Send email
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.log("Error occurred:", error);
+              } else {
+                console.log("Email sent:", info.response);
+              }
+            });
+            res.json(results);
+          })
           .catch((err) => {
             if (err) throw err;
           });
