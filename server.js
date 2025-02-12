@@ -4,7 +4,6 @@ const app = express();
 const PORT = 3001;
 const port = 3002;
 const { MongoClient } = require("mongodb");
-
 const cors = require("cors");
 
 const nodemailer = require("nodemailer");
@@ -56,7 +55,6 @@ app.listen(PORT, () => {
 
 app.post("/signup", (req, res) => {
   var { email } = req.body;
-  console.log("EMAIL", email);
 
   db.collection("Users")
     .find({ email: email })
@@ -92,5 +90,4 @@ app.post("/signup", (req, res) => {
         console.log("IN USE");
       }
     });
-  //   check if email already in use
 });
