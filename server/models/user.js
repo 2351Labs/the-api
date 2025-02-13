@@ -21,49 +21,6 @@ const Email = new Schema({
   validated: { type: Boolean, default: false },
 });
 
-const Password = new Schema({
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    validate: [
-      {
-        validator: function(value) {
-          // Check for at least one uppercase letter
-          return /^(?=.*[A-Z])/.test(value);
-        },
-        message: 'Password must contain at least one uppercase letter.'
-      },
-      {
-        validator: function(value) {
-          // Check for at least one digit
-          return /^(?=.*\d)/.test(value);
-        },
-        message: 'Password must contain at least one digit.'
-      },
-      {
-        validator: function(value) {
-          // Check for at least one special character
-          return /^(?=.*[@$!%*?&])/.test(value);
-        },
-        message: 'Password must contain at least one special character.'
-      },
-      {
-        validator: function(value) {
-          // Check for at least 8 characters in length
-          return /^.{8,}$/.test(value);
-        },
-        message: 'Password must be at least 8 characters long.'
-      },
-      {
-        validator: function(value) {
-          // Check for allowed characters only (no disallowed characters)
-          return /^[A-Za-z\d@$!%*?&]+$/.test(value);
-        },
-        message: 'Password contains invalid characters.'
-      }
-    ]
-  }
-})
 // const Point = new mongoose.Schema({
 //   type: {
 //     type: String,
@@ -90,47 +47,57 @@ const UserSchema = new Schema(
     // password not required since Oauth account will not include password for login
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      // required: [true, "Password is required"],
       validate: [
         {
-          validator: function(value) {
+          validator: function (value) {
             // Check for at least one uppercase letter
             return /^(?=.*[A-Z])/.test(value);
           },
-          message: 'Password must contain at least one uppercase letter.'
+          message: "Password must contain at least one uppercase letter.",
         },
         {
-          validator: function(value) {
+          validator: function (value) {
             // Check for at least one digit
             return /^(?=.*\d)/.test(value);
           },
-          message: 'Password must contain at least one digit.'
+          message: "Password must contain at least one digit.",
         },
         {
-          validator: function(value) {
+          validator: function (value) {
             // Check for at least one special character
             return /^(?=.*[@$!%*?&])/.test(value);
           },
-          message: 'Password must contain at least one special character.'
+          message: "Password must contain at least one special character.",
         },
         {
-          validator: function(value) {
+          validator: function (value) {
             // Check for at least 8 characters in length
             return /^.{8,}$/.test(value);
           },
-          message: 'Password must be at least 8 characters long.'
+          message: "Password must be at least 8 characters long.",
         },
         {
-          validator: function(value) {
+          validator: function (value) {
             // Check for allowed characters only (no disallowed characters)
             return /^[A-Za-z\d@$!%*?&]+$/.test(value);
           },
-          message: 'Password contains invalid characters.'
-        }
-      ]
+          message: "Password contains invalid characters.",
+        },
+      ],
     },
     email: { type: Email, required: true, unique: true },
-    OAuth: { googleId: { type: String } },
+    OAuth: {
+      microsoft: {
+        sub: { type: String, unique: true}, // Microsoft user ID
+        tid: { type: String }, // Tenant ID (Azure AD)
+        oid: { type: String }, // Object ID (Azure AD)
+      },
+      google: {
+        sub: { type: String, unique: true}, // Google user ID
+        picture: { type: String },
+      },
+    },
     profile: {
       firstName: String,
       lastName: String,
