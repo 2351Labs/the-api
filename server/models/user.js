@@ -21,6 +21,49 @@ const Email = new Schema({
   validated: { type: Boolean, default: false },
 });
 
+const Password = new Schema({
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    validate: [
+      {
+        validator: function(value) {
+          // Check for at least one uppercase letter
+          return /^(?=.*[A-Z])/.test(value);
+        },
+        message: 'Password must contain at least one uppercase letter.'
+      },
+      {
+        validator: function(value) {
+          // Check for at least one digit
+          return /^(?=.*\d)/.test(value);
+        },
+        message: 'Password must contain at least one digit.'
+      },
+      {
+        validator: function(value) {
+          // Check for at least one special character
+          return /^(?=.*[@$!%*?&])/.test(value);
+        },
+        message: 'Password must contain at least one special character.'
+      },
+      {
+        validator: function(value) {
+          // Check for at least 8 characters in length
+          return /^.{8,}$/.test(value);
+        },
+        message: 'Password must be at least 8 characters long.'
+      },
+      {
+        validator: function(value) {
+          // Check for allowed characters only (no disallowed characters)
+          return /^[A-Za-z\d@$!%*?&]+$/.test(value);
+        },
+        message: 'Password contains invalid characters.'
+      }
+    ]
+  }
+})
 // const Point = new mongoose.Schema({
 //   type: {
 //     type: String,
@@ -45,9 +88,49 @@ const UserSchema = new Schema(
     },
     //Our password is hashed with bcrypt below
     // password not required since Oauth account will not include password for login
-    password: { type: String, required: false },
+    password: {
+      type: String,
+      required: [true, 'Password is required'],
+      validate: [
+        {
+          validator: function(value) {
+            // Check for at least one uppercase letter
+            return /^(?=.*[A-Z])/.test(value);
+          },
+          message: 'Password must contain at least one uppercase letter.'
+        },
+        {
+          validator: function(value) {
+            // Check for at least one digit
+            return /^(?=.*\d)/.test(value);
+          },
+          message: 'Password must contain at least one digit.'
+        },
+        {
+          validator: function(value) {
+            // Check for at least one special character
+            return /^(?=.*[@$!%*?&])/.test(value);
+          },
+          message: 'Password must contain at least one special character.'
+        },
+        {
+          validator: function(value) {
+            // Check for at least 8 characters in length
+            return /^.{8,}$/.test(value);
+          },
+          message: 'Password must be at least 8 characters long.'
+        },
+        {
+          validator: function(value) {
+            // Check for allowed characters only (no disallowed characters)
+            return /^[A-Za-z\d@$!%*?&]+$/.test(value);
+          },
+          message: 'Password contains invalid characters.'
+        }
+      ]
+    },
     email: { type: Email, required: true, unique: true },
-    OAuth: { googleId: { type: String} },
+    OAuth: { googleId: { type: String } },
     profile: {
       firstName: String,
       lastName: String,
