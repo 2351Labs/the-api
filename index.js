@@ -1,5 +1,6 @@
 require("dotenv").config();
 const userRoutes = require("./server/routes/userRoutes");
+const itemRoutes = require("./server/routes/itemRoutes");
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -42,7 +43,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", userRoutes);
-
+app.use("/items", itemRoutes);
 
 // app.get("/login", async (req, res) => {
 //   const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
