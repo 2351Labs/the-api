@@ -3,13 +3,35 @@ const Item = require("../models/item");
 async function pagination(req, res) {
   const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
   const pageSize = parseInt(req.query.pageSize) || 10; // Default to 10 items per page if not provided
-
-  // using single aggregation pipeline to ensure that the total count is accurate. 
-  // (ensure using same snapshot of database for both queries)
+  const searchQuery = req.query.q || ""; // Get the search query (e.g., service name)
+  const entityTypes = req.query.entityTypes
+    ? req.query.entityTypes.split(",")
+    : []; // Get an array of entity types (if provided)
+  console.log("entityTypes", entityTypes);
+  // using single aggregation pipeline to ensure that the total count is accurate.
   try {
     const skip = (page - 1) * pageSize;
 
+    // Build filter query for both search and service type
+    const filterQuery = {};
+
+    if (searchQuery) {
+      filterQuery["Service Name"] = { $regex: searchQuery, $options: "i" }; // Case-insensitive search for service name
+    }
+  
+    if (entityTypes.length > 0) {
+      // Use $regex to perform case-insensitive matching for each entity type
+      filterQuery["Entity Type"] = {
+        $in: entityTypes.map(type => new RegExp(`^${type}$`, "i")), // Case-insensitive regex match for each entity type
+      };
+    }
+
+    console.log("filterQuery", filterQuery);
+    // Aggregation pipeline with filter, pagination, and total count
     const result = await Item.aggregate([
+      {
+        $match: filterQuery, // Apply filter if available
+      },
       {
         $facet: {
           items: [{ $skip: skip }, { $limit: pageSize }],
@@ -21,7 +43,6 @@ async function pagination(req, res) {
     const items = result[0].items;
     const totalItems =
       result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0;
-
     res.json({
       page,
       pageSize,
@@ -33,7 +54,6 @@ async function pagination(req, res) {
     console.error("Error fetching items:", error);
     res.status(500).send("Internal Server Error");
   }
-
   // try {
   //   const skip = (page - 1) * pageSize; // Calculate documents to skip
 

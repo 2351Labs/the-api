@@ -66,9 +66,9 @@ const CollectorSchema = new Schema({
   "Last Updated": { type: Date, required: true },
   Contacts: [ContactSchema],
   Documentation: [DocumentationSchema],
-  RelatedRepos: [RepoSchema],
-  SupportChannels: [ChannelSchema],
-  MonitoringChannels: [ChannelSchema],
+  "Related Repos": [RepoSchema],
+  "Support Channels": [ChannelSchema],
+  "Monitoring Channels": [ChannelSchema],
   "Infrastructure Components": [InfrastructureComponentSchema],
   "Service Maturity Score(s)": [MaturityScoreSchema],
 });
