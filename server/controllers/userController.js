@@ -25,13 +25,11 @@ function responseInfo(user) {
 
 const getUser = async (req, res) => {
   // get user using client token
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  const userDecoded = req.user; // Extract user ID from the token
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({
-      "email.address": decoded.email.address,
+      "email.address": userDecoded.email.address,
     }).select("profile email.address -_id"); // Fetch selected fields
     if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
@@ -115,7 +113,7 @@ const googleOAuth = async (req, res) => {
             "OAuth.google.picture": userInfo.picture,
             "profile.firstName": userInfo.given_name,
             "profile.lastName": userInfo.family_name,
-            "email.validated": true
+            "email.validated": true,
           },
         },
         { new: true } // Returns the updated document
@@ -133,7 +131,7 @@ const googleOAuth = async (req, res) => {
         OAuth: {
           google: {
             sub: userInfo.sub,
-            picture: userInfo.picture
+            picture: userInfo.picture,
           },
         },
       });
@@ -196,7 +194,7 @@ const microsoftOAuth = async (req, res) => {
       console.log("userByEmail");
       // if account with email exists, attach google id to account (sub value in user token)
       const user = await User.findOneAndUpdate(
-        { "email.address": userInfo.email},
+        { "email.address": userInfo.email },
         {
           $set: {
             "OAuth.microsoft.sub": userInfo.sub,
@@ -204,7 +202,7 @@ const microsoftOAuth = async (req, res) => {
             "OAuth.microsoft.oid": userInfo.oid,
             "profile.firstName": split.firstName,
             "profile.lastName": split.lastName,
-            "email.validated": true
+            "email.validated": true,
           },
         },
         { new: true } // Returns the updated document

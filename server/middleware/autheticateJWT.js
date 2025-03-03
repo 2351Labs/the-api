@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 
 const authenticateJWT = (req, res, next) => {
   const token = req.header("Authorization");
-
   if (!token) {
     console.log("NO TOKEN", token);
 
@@ -17,6 +16,7 @@ const authenticateJWT = (req, res, next) => {
       : token;
     const verified = jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET);
     req.user = verified; // Attach user payload to request object
+    console.log("request user", req.user);
     next();
   } catch (err) {
     return res.status(403).json({ message: "Invalid or expired token." });

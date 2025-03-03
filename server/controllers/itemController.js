@@ -7,7 +7,6 @@ async function pagination(req, res) {
   const entityTypes = req.query.entityTypes
     ? req.query.entityTypes.split(",")
     : []; // Get an array of entity types (if provided)
-  console.log("entityTypes", entityTypes);
   // using single aggregation pipeline to ensure that the total count is accurate.
   try {
     const skip = (page - 1) * pageSize;

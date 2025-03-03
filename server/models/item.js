@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
@@ -20,10 +20,19 @@ const ContactSchema = new Schema({
   description: { type: String, required: true },
 });
 
-const DocumentationSchema = new Schema({
+const ExternalDocumentationSchema = new Schema({
   title: { type: String, required: true },
   url: { type: String, required: true },
   description: { type: String, required: true },
+});
+
+const InternalDocumentationSchema = new Schema({
+  title: { type: String, required: true },
+  document: { type: String, required: true },
+  history: {
+    time: { type: String, required: true },
+    updatedBy: { type: String, required: true },
+  },
 });
 
 const RepoSchema = new Schema({
@@ -59,21 +68,28 @@ const CollectorSchema = new Schema({
   Description: { type: String, required: true },
   "Source Repo": { type: String, required: true },
   Product: { type: String, required: true },
-  "Entity Tags": [TagSchema],
+  "Entity Tags": { type: TagSchema, required: true },
   "Programming Language": { type: String, required: true },
   Version: { type: String, required: true },
-  "Service Aliases": [AliasSchema],
+  "Service Aliases": { type: AliasSchema, required: true },
   "Last Updated": { type: Date, required: true },
-  Contacts: [ContactSchema],
-  Documentation: [DocumentationSchema],
-  "Related Repos": [RepoSchema],
-  "Support Channels": [ChannelSchema],
-  "Monitoring Channels": [ChannelSchema],
-  "Infrastructure Components": [InfrastructureComponentSchema],
-  "Service Maturity Score(s)": [MaturityScoreSchema],
+  Contacts: { type: ContactSchema },
+  "External Documentation": {
+    type: ExternalDocumentationSchema,
+    required: true,
+  },
+  "Internal Documentation": { type: InternalDocumentationSchema },
+  "Related Repos": { type: RepoSchema, required: true },
+  "Support Channels": { type: ChannelSchema, required: true },
+  "Monitoring Channels": { type: ChannelSchema, required: true },
+  "Infrastructure Components": {
+    type: InfrastructureComponentSchema,
+    required: true,
+  },
+  "Service Maturity Score(s)": { type: MaturityScoreSchema, required: true },
 });
 
 // Create the model
-const Item = mongoose.model('Item', CollectorSchema);
+const Item = mongoose.model("Item", CollectorSchema);
 
 module.exports = Item;
