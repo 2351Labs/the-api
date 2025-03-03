@@ -152,8 +152,6 @@ const microsoftOAuth = async (req, res) => {
   const REDIRECT_URI = process.env.MICROSOFT_REDIRECT_URI;
   try {
     const { code } = req.body;
-
-    console.log("CODE", code);
     const tokenResponse = await axios.post(
       `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`,
       new URLSearchParams({

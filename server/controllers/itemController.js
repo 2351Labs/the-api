@@ -1,14 +1,23 @@
 const Item = require("../models/item");
 
+function capitalizeFirstLetter(str) {
+  if (typeof str !== "string") return ""; // Ensure the input is a string
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 async function pagination(req, res) {
   const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
   const pageSize = parseInt(req.query.pageSize) || 10; // Default to 10 items per page if not provided
   const searchQuery = req.query.q || ""; // Get the search query (e.g., service name)
+  const sort = parseInt(req.query.sort) || 1; //1 for ascending order, -1 for descending order
+  const sortBy = capitalizeFirstLetter(req.query.sortBy) || "";
   const entityTypes = req.query.entityTypes
     ? req.query.entityTypes.split(",")
     : []; // Get an array of entity types (if provided)
   // using single aggregation pipeline to ensure that the total count is accurate.
+
   try {
+    console.log("REQ!@", req.query);
     const skip = (page - 1) * pageSize;
 
     // Build filter query for both search and service type
@@ -17,17 +26,62 @@ async function pagination(req, res) {
     if (searchQuery) {
       filterQuery["Service Name"] = { $regex: searchQuery, $options: "i" }; // Case-insensitive search for service name
     }
-  
+
     if (entityTypes.length > 0) {
       // Use $regex to perform case-insensitive matching for each entity type
       filterQuery["Entity Type"] = {
-        $in: entityTypes.map(type => new RegExp(`^${type}$`, "i")), // Case-insensitive regex match for each entity type
+        $in: entityTypes.map((type) => new RegExp(`^${type}$`, "i")), // Case-insensitive regex match for each entity type
       };
     }
 
-    console.log("filterQuery", filterQuery);
+    // FOR SORTING:
+    let sortByDefinition = []; //must calculate average to sort by average score
+    if (sortBy && sort) {
+      if (sortBy == "averageMaturityScore") {
+        console.log("BY AVERAGE");
+        sortByDefinition = [
+          { $addFields: { originalScores: "$Service Maturity Score(s)" } }, // Preserve the original array
+          { $unwind: "$Service Maturity Score(s)" }, // Flatten the array
+          {
+            $group: {
+              _id: "$_id", // Group by document _id to avoid duplicates by service name
+              avgScore: { $avg: "$Service Maturity Score(s).score" }, // Calculate average score
+              originalDoc: { $first: "$$ROOT" }, // Keep the original document
+            },
+          },
+          { $sort: { avgScore: sort } }, // Sort by average score in ascending or descending order
+          {
+            $replaceRoot: {
+              newRoot: {
+                $mergeObjects: ["$originalDoc", { avgScore: "$avgScore" }],
+              }, // Add avgScore to the original document
+            },
+          },
+          {
+            $set: {
+              "Service Maturity Score(s)": "$originalScores", // Restore the original array
+            },
+          },
+          {
+            $project: {
+              originalScores: 0, // Remove the "originalScores" field if not needed in the final result
+            },
+          },
+        ];
+      } else {
+        //for default (sort alphabetical)
+        sortByDefinition = [
+          {
+            $sort: {
+              [sortBy]: sort, // Sort by the field provided in query param 'sortBy', and order provided in 'sort'
+            },
+          },
+        ]; // Ascending order
+      }
+    }
     // Aggregation pipeline with filter, pagination, and total count
     const result = await Item.aggregate([
+      ...sortByDefinition,//get additional sort aggregate if given
       {
         $match: filterQuery, // Apply filter if available
       },
