@@ -10,9 +10,14 @@ const app = express();
 const port = process.env.PORT;
 
 // Middleware
-app.use(cors(
-  // { origin: process.env.FRONTEND_URL, credentials: true } //Only allow requests from set origin
-));
+app.use(
+  cors(
+    {
+      origin: ["https://scrollos.netlify.app", "https://localhost:5174"],
+      credentials: true,
+    } //Only allow requests from set origin
+  )
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

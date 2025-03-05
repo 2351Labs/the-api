@@ -62,6 +62,11 @@ const MaturityScoreSchema = new Schema({
   description: { type: String, required: true },
 });
 
+const History = new Schema({
+  time: { type: String, required: true },
+  description: {type: String, required: true},
+});
+
 // Define the main schema
 const CollectorSchema = new Schema({
   "Entity Type": { type: String, required: true },
@@ -88,6 +93,7 @@ const CollectorSchema = new Schema({
     required: true,
   },
   "Service Maturity Score(s)": { type: [MaturityScoreSchema], required: true },
+  History: { type: [History], required: false },
 });
 
 // Create the model

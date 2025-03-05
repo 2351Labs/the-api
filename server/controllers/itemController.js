@@ -17,7 +17,6 @@ async function pagination(req, res) {
   // using single aggregation pipeline to ensure that the total count is accurate.
 
   try {
-    console.log("REQ!@", sortBy, sort);
     const skip = (page - 1) * pageSize;
 
     // Build filter query for both search and service type
