@@ -10,7 +10,9 @@ const app = express();
 const port = process.env.PORT;
 
 // Middleware
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(cors(
+  // { origin: process.env.FRONTEND_URL, credentials: true } //Only allow requests from set origin
+));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -49,15 +51,15 @@ app.use("/items", itemRoutes);
 //   const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
 
 //   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-  
+
 //   const GOOGLE_CALLBACK_URL = "http://localhost:3000/login";
-  
+
 //   const GOOGLE_OAUTH_SCOPES = [
-  
+
 //   "https%3A//www.googleapis.com/auth/userinfo.email",
 
 //   "https%3A//www.googleapis.com/auth/userinfo.profile",
-  
+
 //   ];
 
 //   const state = "some_state";

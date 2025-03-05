@@ -24,6 +24,8 @@ function responseInfo(user) {
 }
 
 const getUser = async (req, res) => {
+  console.log("TEST!!", User);
+
   // get user using client token
   const userDecoded = req.user; // Extract user ID from the token
 
@@ -39,6 +41,7 @@ const getUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
+  console.log("CREATE USER");
   const { email, password } = req.body;
   // check if account with same email exists
   try {
@@ -66,8 +69,12 @@ const validateUser = async (req, res) => {
     if (!user) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
-
-    const isMatch = await user.comparePassword(password);
+    try {
+      var isMatch = await user.comparePassword(password);
+    } catch (err) {
+      //if account has no password associated with it, must be oauth account
+      return res.status(500).json({ error: "Please use correct sign in method for your account" });
+    }
 
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid email or password" });

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+Schema = mongoose.Schema;
 
-const { Schema } = mongoose;
+// const { Schema } = mongoose;
 
 // Define the sub-schemas
 const TagSchema = new Schema({
@@ -68,25 +69,25 @@ const CollectorSchema = new Schema({
   Description: { type: String, required: true },
   "Source Repo": { type: String, required: true },
   Product: { type: String, required: true },
-  "Entity Tags": { type: TagSchema, required: true },
+  "Entity Tags": { type: [TagSchema], required: true },
   "Programming Language": { type: String, required: true },
   Version: { type: String, required: true },
-  "Service Aliases": { type: AliasSchema, required: true },
+  "Service Aliases": { type: [AliasSchema], required: true },
   "Last Updated": { type: Date, required: true },
-  Contacts: { type: ContactSchema },
+  Contacts: { type: [ContactSchema] },
   "External Documentation": {
-    type: ExternalDocumentationSchema,
+    type: [ExternalDocumentationSchema],
     required: true,
   },
   "Internal Documentation": { type: InternalDocumentationSchema },
-  "Related Repos": { type: RepoSchema, required: true },
-  "Support Channels": { type: ChannelSchema, required: true },
-  "Monitoring Channels": { type: ChannelSchema, required: true },
+  "Related Repos": { type: [RepoSchema], required: true },
+  "Support Channels": { type: [ChannelSchema], required: true },
+  "Monitoring Channels": { type: [ChannelSchema], required: true },
   "Infrastructure Components": {
-    type: InfrastructureComponentSchema,
+    type: [InfrastructureComponentSchema],
     required: true,
   },
-  "Service Maturity Score(s)": { type: MaturityScoreSchema, required: true },
+  "Service Maturity Score(s)": { type: [MaturityScoreSchema], required: true },
 });
 
 // Create the model
