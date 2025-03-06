@@ -8,11 +8,39 @@ const Item = require("../models/item"); //for dev
 
 router.get("/pagination", authenticateJWT, itemController.pagination); ///params: items?page=2&pageSize=5
 router.get("/id/:id", authenticateJWT, itemController.itemById); ///params: items?page=2&pageSize=5
+router.put("/document/:id", authenticateJWT, itemController.updateInternalDocument); ///params: items?page=2&pageSize=5
 router.get("/insertDocs", async (req, res) => {
   // Generate 20 documents
   const serviceDocuments = createServiceDocuments(20);
 
-  const result = await Item.insertMany(serviceDocuments);
+  // const result = await Item.updateMany(
+  //   {},
+  //   {
+  //     $push: {
+  //       History: {
+  //         time: new Date().toISOString(),
+  //         description: "Timeline event 3",
+  //       },
+  //     },
+  //   }
+  // );
+  const result = await Item.updateMany(
+    {}, // Empty filter matches all documents in the collection
+    {
+      $set: {
+        "Internal Documentation": {
+          document: "This is the test document content", // Set the document field for all documents
+          // history: [{
+          //   time: new Date().toISOString(), // Set current timestamp
+          //   updatedBy: new ObjectId(userId), // Assuming userId is the ObjectId of the user making the update
+          // }],
+        },
+      },
+    }
+  );
+
+
+  // const result = await Item.insertMany(serviceDocuments);
   res.send(result);
 });
 

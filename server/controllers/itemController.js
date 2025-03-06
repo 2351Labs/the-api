@@ -1,8 +1,39 @@
 const Item = require("../models/item");
+const { ObjectId } = require("mongodb"); // ✅ Import ObjectId from MongoDB
 
 function capitalizeFirstLetter(str) {
   if (typeof str !== "string") return ""; // Ensure the input is a string
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+async function updateInternalDocument(req, res) {
+  const { id } = req.params;
+  const { document } = req.body;
+  console.log("USER!!", req.user)
+  try {
+    const result = await Item.findOneAndUpdate(
+      { _id: new ObjectId(id) }, // Match document by _id
+      {
+        $set: {
+          "Internal Documentation.document": document, // Update document field
+        },
+        $push: {
+          "Internal Documentation.history": {
+            time: new Date().toISOString(), // Add the current timestamp
+            updatedBy: new ObjectId(req.user._id), // User who made the update
+          },
+        },
+      },
+      {
+        upsert: true, // Create the history array if it doesn't exist
+        new: true, // Return the updated document
+      }
+    );
+    console.log("Updated Document:", result["Internal Documentation"]);
+    res.status(200).send("Save was successful!");
+  } catch (error) {
+    console.error("Error updating internal documentation:", error);
+  }
 }
 
 async function pagination(req, res) {
@@ -36,7 +67,6 @@ async function pagination(req, res) {
     // FOR SORTING:
     let sortByDefinition = []; //must calculate average to sort by average score
     if (sortBy && sort) {
-
       if (sortBy == "Service Maturity Score(s)") {
         console.log("BY AVERAGE");
         sortByDefinition = [
@@ -148,4 +178,5 @@ async function itemById(req, res) {
 module.exports = {
   pagination,
   itemById,
+  updateInternalDocument,
 };

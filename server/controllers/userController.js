@@ -24,7 +24,6 @@ function responseInfo(user) {
 }
 
 const getUser = async (req, res) => {
-  console.log("TEST!!", User);
 
   // get user using client token
   const userDecoded = req.user; // Extract user ID from the token
@@ -41,7 +40,6 @@ const getUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  console.log("CREATE USER");
   const { email, password } = req.body;
   // check if account with same email exists
   try {
@@ -62,7 +60,6 @@ const createUser = async (req, res) => {
 
 const validateUser = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ "email.address": email });
 
@@ -80,6 +77,7 @@ const validateUser = async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
+    console.log("USER VALIDE:", user)
     res.json(responseInfo(user));
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -192,11 +190,9 @@ const microsoftOAuth = async (req, res) => {
     });
 
     if (userByMicrosoftId) {
-      console.log("userByMicrosoftId");
       //if account with with microsoft id exists, login user(id is sub value in user token)
       res.json(responseInfo(userByMicrosoftId));
     } else if (await getUserByEmail()) {
-      console.log("userByEmail");
       // if account with email exists, attach google id to account (sub value in user token)
       const user = await User.findOneAndUpdate(
         { "email.address": userInfo.email },
@@ -215,7 +211,6 @@ const microsoftOAuth = async (req, res) => {
       console.log("attached to email, sending response", user);
       res.json(responseInfo(user));
     } else {
-      console.log("new user");
       // if account with email doesn't exist, create new account
       const user = await User.create({
         email: { address: userInfo.email, validated: true },

@@ -28,7 +28,6 @@ const ExternalDocumentationSchema = new Schema({
 });
 
 const InternalDocumentationSchema = new Schema({
-  title: { type: String, required: true },
   document: { type: String, required: true },
   history: {
     time: { type: String, required: true },

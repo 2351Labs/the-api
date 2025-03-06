@@ -13,8 +13,9 @@ const port = process.env.PORT;
 app.use(
   cors(
     {
-      origin: ["https://scrollos.netlify.app", "https://localhost:5174"],
-      credentials: true,
+      orgin:'*'
+      // origin: ["https://scrollos.netlify.app", "https://localhost:5174"],
+      // credentials: true,
     } //Only allow requests from set origin
   )
 );
