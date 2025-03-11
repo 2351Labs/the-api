@@ -9,7 +9,6 @@ function capitalizeFirstLetter(str) {
 async function updateInternalDocument(req, res) {
   const { id } = req.params;
   const { document } = req.body;
-  console.log("USER!!", req.user)
   try {
     const result = await Item.findOneAndUpdate(
       { _id: new ObjectId(id) }, // Match document by _id

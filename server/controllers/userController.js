@@ -59,6 +59,7 @@ const createUser = async (req, res) => {
 };
 
 const validateUser = async (req, res) => {
+  console.log("validating user...")
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ "email.address": email });
@@ -77,7 +78,6 @@ const validateUser = async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    console.log("USER VALIDE:", user)
     res.json(responseInfo(user));
   } catch (error) {
     res.status(500).json({ error: error.message });
